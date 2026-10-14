@@ -7,9 +7,9 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-9cf?style=flat-square)]()
 [![Release](https://img.shields.io/github/v/release/Igor-Shelloff/tg-analytics?style=flat-square&color=4ade80)](https://github.com/Igor-Shelloff/tg-analytics/releases/latest)
 
-**A modern open-source desktop app for Telegram channel analytics.** Track subscriber growth, engagement rates, top posts, best posting times and content mix — for your own channels and any public channel. Everything runs **locally on your machine**.
+**A modern open-source desktop app for Telegram channel analytics.** Track subscriber growth, engagement rates, top posts, best posting times and content mix — for your own channels and any public channel. Analytics data and settings are stored locally on your machine.
 
-[Features](#-features) • [Screenshots](#-screenshots) • [Installation](#-installation) • [Usage](#-usage) • [FAQ](#-faq) • [Advanced](#-advanced-features) • [Support](#-support-the-project)
+[Features](#-features) • [Screenshots](#-screenshots) • [Installation](#-installation) • [Usage](#-usage) • [Privacy](#-privacy) • [FAQ](#-faq) • [Support](#-support-the-project)
 
 ---
 
@@ -19,10 +19,10 @@
 
 Unlike SaaS analytics platforms (TGStat, Telemetr), TG Analytics:
 
-- **Stores everything locally** — your data never leaves your computer
+- **Has no proprietary analytics backend** — there is no server that receives your data
 - **Analyzes any public channel** — track competitors without admin rights
-- **Works offline** — after the first sync, all charts and reports render from the local database
-- **Is completely free** — no subscriptions, no limits, no ads
+- **Works offline after initial sync** — all charts and reports render from the local database
+- **Is completely free** — no subscriptions, no limits, no ads, no telemetry
 
 Perfect for:
 
@@ -31,7 +31,7 @@ Perfect for:
 - **Marketers** — research competitors and benchmark against industry peers
 - **Agencies** — generate beautiful PDF reports for clients
 
-The app uses the official [Telegram API](https://my.telegram.org/) through Telethon. No third-party servers see your data.
+The app connects directly to the official [Telegram API](https://my.telegram.org/) through Telethon. There is no intermediary server — your requests go straight from your machine to Telegram.
 
 ---
 
@@ -62,14 +62,46 @@ The app uses the official [Telegram API](https://my.telegram.org/) through Telet
 
 ### 🎨 Interface
 - **Modern dark / light / system theme** — follows OS by default
-- **English + Русский** — instantly switchable
+- **English + Русский + Español + Português + Deutsch** — instantly switchable
 - **Smooth animations, zero flicker** — built on HTML/CSS/JS via pywebview
 - **Responsive layout** — sidebar fixed, only content scrolls
 
-### 🔒 Privacy
-- **100% local** — SQLite database in `~/.tg_analytics/`
-- **No telemetry** — the app never phones home
+### 🔒 Local-first
+- **No analytics backend** — the developer of TG Analytics does not receive your data
+- **No telemetry** — the app has no usage tracking, no crash reporting to any server
 - **Open source** — audit every line
+
+---
+
+## 🔐 Privacy
+
+TG Analytics is designed **local-first**: analytics data, settings and exports are stored on your machine. The app has no proprietary backend and no telemetry. It talks directly to the official Telegram API for authentication and data collection — nothing goes through a middleman.
+
+**What stays local:**
+
+- SQLite database with channels, snapshots and posts → `~/.tg_analytics/analytics.db`
+- Configuration (including API credentials and phone number) → `~/.tg_analytics/config.json`
+- Telegram session file → `~/.tg_analytics/sessions/`
+- Exports (PDF / JSON / CSV) → user-chosen folder
+- Logs → `~/.tg_analytics/logs/`
+
+**What leaves your machine:**
+
+- Authentication requests, channel metadata and post data — sent **directly to Telegram** servers, because that's how the Telegram API works
+- Nothing else. There is no analytics endpoint, no error reporter, no update pings to any developer server
+
+**What is not encrypted by the app:**
+
+- The Telegram **session file** is not encrypted on disk (Telethon default). Anyone with read access to that file can potentially access your authorized Telegram account.
+- `config.json` stores `api_id`, `api_hash` and phone number in plain text.
+- The SQLite database is not encrypted.
+
+**What this means in practice:**
+
+- Use TG Analytics on a device you control and trust.
+- If you are concerned about the session file, consider using a **dedicated Telegram account** for analytics rather than your main account with sensitive chats and administrative access.
+- You can revoke a session at any time from **Telegram → Settings → Devices**.
+- Full technical detail is available in the source code on GitHub — every file is open.
 
 ---
 
@@ -95,16 +127,19 @@ Grab the latest release for your OS from the [Releases page](https://github.com/
 - **Linux** — `TGAnalytics-Linux` (make it executable with `chmod +x`)
 - **macOS** — `TGAnalytics-macOS.zip` (unzip and drag `TG Analytics.app` into Applications)
 
-> ⚠️ **macOS:** The app is not code-signed. On first launch macOS may block it.
-> To allow it, open **Terminal** and run:
+Each release asset includes a **SHA-256 checksum** published by GitHub — you can verify the download.
+
+> ⚠️ **Windows SmartScreen:** The executable is not code-signed. Windows may show a warning — click **More info** → **Run anyway**. You can also build from source if you prefer.
+>
+> ⚠️ **macOS:** The app is not notarized with an Apple Developer certificate. On first launch, open Terminal and run:
 >
 > ```bash
 > xattr -cr "/Applications/TG Analytics.app"
 > ```
 >
-> Alternatively: right-click the app → **Open** → **Open** in the dialog.
+> Or right-click the app → **Open** → **Open** in the dialog.
 
-No Python installation required. Just run it.
+No Python installation required.
 
 ### Option 2: Run from source
 
@@ -149,7 +184,7 @@ Click **Track** to start monitoring. The app fetches the latest 100 posts immedi
 
 ### 4. Explore the dashboard
 
-Open **Dashboard** and pick a channel. Choose period 7d / 30d / 90d. Explore:
+Open **Dashboard** and pick a channel. Choose period 7d / 30d / 90d / all time. Explore:
 
 - Subscriber growth chart
 - Average views, ER and posts per period
@@ -187,11 +222,24 @@ Yes. MIT-licensed, no subscriptions, no feature gates. You can also build it you
 Everything is stored locally in `~/.tg_analytics/`:
 
 - `analytics.db` — SQLite database with channels, snapshots and posts
+- `config.json` — settings including API credentials and phone number (plain text)
 - `sessions/` — Telegram session files
 - `exports/` — your exported reports
 - `logs/` — application logs
 
-Nothing is sent to any external server.
+See the [Privacy](#-privacy) section for details on what stays local and what is sent to Telegram.
+</details>
+
+<details>
+<summary><b>Is my Telegram session encrypted?</b></summary>
+
+No — the session file is stored in Telethon's default format and is not encrypted by the app. Anyone with read access to `~/.tg_analytics/sessions/` can potentially access your authorized Telegram account.
+
+If this concerns you:
+
+- Use the app on a device you control.
+- Consider a **dedicated Telegram account** for analytics instead of your main account.
+- You can revoke a session any time in **Telegram → Settings → Devices**.
 </details>
 
 <details>
@@ -207,15 +255,21 @@ Subscriber counts are **not available historically** — the app can only record
 </details>
 
 <details>
+<summary><b>Do old posts keep their views up to date?</b></summary>
+
+Partially. The app refreshes views, reactions and forwards for the most recent posts on every collection cycle. Older posts keep the values captured when they were last in the update window. This means top-post rankings for older posts may slightly lag behind the current reality. If this matters for your workflow, use manual collection before generating reports.
+</details>
+
+<details>
 <summary><b>The app was flagged by my antivirus — why?</b></summary>
 
-PyInstaller-built executables are sometimes flagged as false positives. The full source is open — you can build it yourself or add an exception in your antivirus.
+PyInstaller-built executables are sometimes flagged as false positives. The full source is open — you can build it yourself or add an exception in your antivirus. Release assets include SHA-256 checksums you can verify.
 </details>
 
 <details>
 <summary><b>Does it work behind a proxy?</b></summary>
 
-Yes. Telethon supports SOCKS5, SOCKS4 and HTTP proxies. Proxy settings are on the roadmap — meanwhile, you can set system-level proxy for the Telegram API.
+Yes. Telethon supports SOCKS5, SOCKS4 and HTTP proxies. Proxy settings are on the roadmap — meanwhile, you can set a system-level proxy for the Telegram API.
 </details>
 
 <details>
@@ -296,7 +350,7 @@ tg-analytics/
     ├── index.html
     ├── css/main.css         # design system
     ├── js/                  # app, router, api, charts, pages
-    └── locales/             # en.json, ru.json
+    └── locales/             # en.json, ru.json, es.json, pt.json, de.json
 ```
 
 ---
