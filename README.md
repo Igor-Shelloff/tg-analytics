@@ -311,7 +311,7 @@ TG Analytics is a passion project — free, open-source, and ad-free. If it save
 - ⭐ **Star the repo** — helps more people discover it
 - 🐛 **Report bugs** — open an [issue](https://github.com/Igor-Shelloff/tg-analytics/issues)
 - 💡 **Suggest features** — start a [discussion](https://github.com/Igor-Shelloff/tg-analytics/discussions)
-- ☕ **Buy me a coffee** — [boosty.to/igorshelloffdev](https://boosty.to/igorshelloffdev)
+- ☕ **Buy me a coffee** — [Lava.top](https://app.lava.top/tgsutoposter?tabId=donate) or [boosty.to/igorshelloffdev](https://boosty.to/igorshelloffdev)
 - 📣 **Tell a friend** — share on Twitter / Reddit / Telegram
 
 ---
